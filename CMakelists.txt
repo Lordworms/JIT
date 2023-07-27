@@ -1,0 +1,6 @@
+PROJECT(jit_learning)
+set(CMAKE_CXX_STANDARD 14)
+set(SOURCE_FILES Kaleidoscope/parser.cpp)
+add_executable(parser ${SOURCE_FILES})
+
+
