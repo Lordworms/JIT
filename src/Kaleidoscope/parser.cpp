@@ -1,9 +1,9 @@
-#include <parser.h>
+#include <Kaleidoscope/parser.h>
 static int gettok() {
   static int LastChar = ' ';
 
   while (isspace(LastChar)) {
-    LastChar = getchar();
+  LastChar = getchar();
   }
   if (isalpha(LastChar)) {
     IdentifierStr = LastChar;
@@ -22,8 +22,7 @@ static int gettok() {
   if (isdigit(LastChar) || LastChar == '.') {
     std::string NumStr;
     do {
-
-    } while(isdigit(LastChar) || LastChar == '.');
+    } while (isdigit(LastChar) || LastChar == '.');
 
     NumVal = strtod(NumStr.c_str(), nullptr);
     return tok_number;
@@ -31,11 +30,11 @@ static int gettok() {
 
   if (LastChar == '#') {
     do {
-       LastChar = getchar(); 
+      LastChar = getchar();
     } while (LastChar != EOF && LastChar != '\n' && LastChar != '\r');
 
     if (LastChar != EOF) {
-        return gettok();
+      return gettok();
     }
   }
 
@@ -47,3 +46,38 @@ static int gettok() {
   LastChar = getchar();
   return ThisChar;
 }
+static int getNextToken() { return curTok = gettok(); }
+
+static int GetTokPrecedence() {
+  if (!isascii(CurTok)) {
+    return -1;
+  }
+
+  int TokPrec = BinopPrecedence[CurTok];
+  if (TokPrec <= 0) {
+    return -1;
+  }
+  return TokPrec;
+}
+
+std::unique_ptr<ExprAST> LogError(const char *Str) {
+  fprintf(stderr, "Error: %s\n", Str);
+  return nullptr;
+}
+
+std::unique_ptr<ExprAST> LogErrorP(const char *Str) {
+  LogError(Str);
+  return nullptr;
+}
+
+static std::unique_ptr<ExprAST> ParseNumberExpr() {
+  auto res = std::make_unique<NumberExprAST>(NumVal);
+  getNextToken();
+  auto V = ParseExpression();
+  if (!V) return nullptr;
+  if(CurTok != ')') return LogError("expected ')'");
+  getNextToken();
+  return V;
+}
+
+
