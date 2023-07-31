@@ -6,9 +6,9 @@ SET(SOURCES
     src/Kaleidoscope/parser.cpp
 )
 
-SET(CMAKE_CXX_COMPILER "clang")
+SET(CMAKE_CXX_COMPILER "clang++")
 
-SET(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -g")
+SET(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -g -O3")
 
 SET(PARSER_SOURCES
     src/Kaleidoscope/AST.cpp

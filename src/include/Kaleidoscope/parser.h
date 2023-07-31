@@ -2,14 +2,7 @@
   https://llvm.org/docs/tutorial/MyFirstLanguageFrontend/LangImpl02.html
 */
 #include <Kaleidoscope/AST.h>
-
-#include <cctype>
-#include <cstdio>
-#include <map>
-#include <memory>
-#include <string>
-#include <utility>
-#include <vector>
+namespace Kaleidoscope {
 enum Token {
   tok_eof = -1,
 
@@ -37,3 +30,4 @@ static std::unique_ptr<FunctionAST> ParseDefination();
 static std::unique_ptr<PrototypeAST> ParsePrototype();
 static std::unique_ptr<PrototypeAST> ParseExtern();
 static void HandleDefinition();
+}

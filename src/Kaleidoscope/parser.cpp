@@ -1,4 +1,5 @@
 #include <Kaleidoscope/parser.h>
+namespace Kaleidoscope {
 static int gettok() {
   static int LastChar = ' ';
 
@@ -276,13 +277,17 @@ static void MainLoop() {
   }
 }
 
+
+}  // namespace Kaleidoscope
+
 int main() {
-  BinopPrecedence['<'] = 10;
-  BinopPrecedence['+'] = 20;
-  BinopPrecedence['-'] = 20;
-  BinopPrecedence['*'] = 40;
+  Kaleidoscope::BinopPrecedence['<'] = 10;
+  Kaleidoscope::BinopPrecedence['+'] = 20;
+  Kaleidoscope::BinopPrecedence['-'] = 20;
+  Kaleidoscope::BinopPrecedence['*'] = 40;
 
   fprintf(stderr, "ready> ");
-  getNextToken();
-  MainLoop();
+  Kaleidoscope::getNextToken();
+  Kaleidoscope::MainLoop();
+  return 0;
 }
