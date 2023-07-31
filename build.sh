@@ -35,6 +35,8 @@ else
   echo "Build type should be debug or release"
   exit 1
 fi
-
+mkdir tool
+mkdir build
 echo "build_type is: $build_type"
-
+pushd build
+cmake ..

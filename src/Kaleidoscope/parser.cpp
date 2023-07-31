@@ -23,6 +23,8 @@ static int gettok() {
   if (isdigit(LastChar) || LastChar == '.') {
     std::string NumStr;
     do {
+      NumStr += LastChar;
+      LastChar = getchar();
     } while (isdigit(LastChar) || LastChar == '.');
 
     NumVal = strtod(NumStr.c_str(), nullptr);
@@ -264,6 +266,9 @@ static void MainLoop() {
     switch (CurTok) {
       case tok_eof:
         return;
+      case ';':  // ignore top-level semicolons.
+        getNextToken();
+        break;
       case tok_def:
         HandleDefinition();
         break;
@@ -277,7 +282,6 @@ static void MainLoop() {
   }
 }
 
-
 }  // namespace Kaleidoscope
 
 int main() {
@@ -285,7 +289,6 @@ int main() {
   Kaleidoscope::BinopPrecedence['+'] = 20;
   Kaleidoscope::BinopPrecedence['-'] = 20;
   Kaleidoscope::BinopPrecedence['*'] = 40;
-
   fprintf(stderr, "ready> ");
   Kaleidoscope::getNextToken();
   Kaleidoscope::MainLoop();

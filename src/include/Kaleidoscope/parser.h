@@ -29,5 +29,8 @@ static std::unique_ptr<ExprAST> ParseBinOpRHS(int ExprPrec, std::unique_ptr<Expr
 static std::unique_ptr<FunctionAST> ParseDefination();
 static std::unique_ptr<PrototypeAST> ParsePrototype();
 static std::unique_ptr<PrototypeAST> ParseExtern();
+static void HandleExtern();
+static void HandleTopLevelExpression();
 static void HandleDefinition();
+static void MainLoop();
 }
