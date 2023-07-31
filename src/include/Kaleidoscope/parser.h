@@ -1,7 +1,7 @@
 /*
   https://llvm.org/docs/tutorial/MyFirstLanguageFrontend/LangImpl02.html
 */
-#include <AST.h>
+#include <Kaleidoscope/AST.h>
 
 #include <cctype>
 #include <cstdio>
@@ -29,3 +29,6 @@ static int GetTokPrecedence();
 std::unique_ptr<ExprAST> LogError(const char *Str);
 static std::unique_ptr<ExprAST> ParseExpression(); 
 static std::unique_ptr<ExprAST> ParseNumberExpr();
+static std::unique_ptr<ExprAST> ParseIdentifierExpr();
+static std::unique_ptr<ExprAST> ParsePrimary();
+static std::unique_ptr<ExprAsT> ParseBinOpRHS(int ExprPrec, std::unique_ptr<ExprAST> LHS);

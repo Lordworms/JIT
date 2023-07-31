@@ -3,7 +3,7 @@ static int gettok() {
   static int LastChar = ' ';
 
   while (isspace(LastChar)) {
-  LastChar = getchar();
+    LastChar = getchar();
   }
   if (isalpha(LastChar)) {
     IdentifierStr = LastChar;
@@ -71,13 +71,100 @@ std::unique_ptr<ExprAST> LogErrorP(const char *Str) {
 }
 
 static std::unique_ptr<ExprAST> ParseNumberExpr() {
-  auto res = std::make_unique<NumberExprAST>(NumVal);
+  auto Result = std::make_unique<NumberExprAST>(NumVal);
+  getNextToken();
+  return std::move(Result);
+}
+
+static std::unique_ptr<ExprAsT> ParseParentExpr() {
   getNextToken();
   auto V = ParseExpression();
-  if (!V) return nullptr;
-  if(CurTok != ')') return LogError("expected ')'");
+  if (!V) {
+    return nullptr;
+  }
+
+  if (curTok != ')') {
+    return LogError("expected ')' ");
+  }
   getNextToken();
   return V;
 }
 
+static std::unique_ptr<ExprAST> ParseIdentifierExpr() {
+  std::string IdName = IdentifierStr;
 
+  getNextToken();
+
+  // simple variable ref
+  if (curTok != '(') {
+    return std::make_unique<VariableExprAST>(IdName);
+  }
+
+  getNextToken();
+
+  std::vector<std::unique_ptr<ExprAsT>> Args;
+
+  if (CurTok != ')') {
+    while (1) {
+      if (auto arg = ParseExpression()) {
+        Args.push_back(std::move(arg));
+      } else {
+        return nullptr;
+      }
+
+      if (CurTok == ')') {
+        break;
+      }
+
+      if (CurTok != ',') {
+        return LogError("Expected ')' or ',' in argument list");
+      }
+      getNextToken();
+    }
+  }
+
+  getNextToken();
+
+  return std::make_unique<CallExprAST>(IdName, std::move(Args));
+}
+
+static std::unique_ptr<ExprAST> ParsePrimary() {
+  switch (CurTok) {
+    case tok_identifier:
+      return ParseIdentifierExpr();
+    case tok_number:
+      return ParseNumberExpr();
+    case '(':
+      return ParseParentExpr();
+    default:
+      return LogError("unknown token when expecting an expression");
+  }
+}
+
+static std::unique_ptr<ExprAsT> ParseBinOpRHS(int ExprPrec,
+                                              std::unique_ptr<ExprAST> LHS) {
+  while (true) {
+    int TokPrec = GetTokPrecedence();
+
+    if (TokPrec < ExprPrec) {
+      return LHS;
+    }
+
+    int BinOp = CurTok;
+    getNextToken();
+
+    auto RHS = ParsePrimary();
+
+    if (!RHS) {
+      return nullptr;
+    }
+
+    int NextPrec = GetTokPrecedence();
+    if (TokPrec < NextPrec) {
+      RHS = ParseBinOpRHS(TokPrec + 1, std::move(RHS));
+      if (!RHS) {
+        return nullptr;
+      }
+    }
+  }
+}
