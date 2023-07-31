@@ -1,6 +1,22 @@
-PROJECT(jit_learning)
-set(CMAKE_CXX_STANDARD 14)
-set(SOURCE_FILES Kaleidoscope/parser.cpp)
-add_executable(parser ${SOURCE_FILES})
+cmake_minimum_required(VERSION 3.26)
+PROJECT(Kaleidoscope)
+SET(CMAKE_CXX_STANDARD 17)
+SET(SOURCES
+    src/Kaleidoscope/AST.cpp
+    src/Kaleidoscope/parser.cpp
+)
 
+SET(CMAKE_CXX_COMPILER "clang")
 
+SET(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -g")
+
+SET(PARSER_SOURCES
+    src/Kaleidoscope/AST.cpp
+    src/Kaleidoscope/parser.cpp
+)
+
+include_directories(src/include)
+
+add_executable(parser ${PARSER_SOURCES})
+
+target_include_directories(parser PUBLIC include)
