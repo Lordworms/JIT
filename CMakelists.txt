@@ -2,22 +2,30 @@ cmake_minimum_required(VERSION 3.26)
 PROJECT(Kaleidoscope)
 set(CMAKE_VERBOSE_MAKEFILE ON)
 SET(CMAKE_CXX_STANDARD 17)
+# find the llvm package in your pc for using
+find_package(LLVM REQUIRED CONFIG)
+message(STATUS "Found LLVM ${LLVM_PACAKGE_VERSION}")
+message(STATUS "Using LLVMConfig.cmake in: ${LLVM_DIR}")
+
 SET(SOURCES
     src/Kaleidoscope/AST.cpp
     src/Kaleidoscope/parser.cpp
 )
 
 SET(CMAKE_CXX_COMPILER "clang++")
-
+# we use -g O0 since this project is for learning some shit
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -O0")
 
 SET(PARSER_SOURCES
     src/Kaleidoscope/AST.cpp
     src/Kaleidoscope/parser.cpp
 )
-
+include_directories(${LLVM_INCLUDE_DIRS})
+# separate the arguments to make it possible to pass parameter to clang++
+separate_arguments(LLVM_DEFINITIONS_LIST NATIVE_COMMAND ${LLVM_DEFINITIONS})
 include_directories(src/include)
 
 add_executable(parser ${PARSER_SOURCES})
-
+llvm_map_components_to_libnames(llvm_libs support core irreader)
 target_include_directories(parser PUBLIC include)
+target_link_libraries(parser ${llvm_libs})

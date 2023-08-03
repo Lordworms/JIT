@@ -63,16 +63,6 @@ static int GetTokPrecedence() {
   return TokPrec;
 }
 
-std::unique_ptr<ExprAST> LogError(const char *Str) {
-  fprintf(stderr, "Error: %s\n", Str);
-  return nullptr;
-}
-
-std::unique_ptr<PrototypeAST> LogErrorP(const char *Str) {
-  LogError(Str);
-  return nullptr;
-}
-
 static std::unique_ptr<ExprAST> ParseNumberExpr() {
   auto Result = std::make_unique<NumberExprAST>(NumVal);
   getNextToken();
@@ -237,24 +227,38 @@ static std::unique_ptr<PrototypeAST> ParseExtern() {
  */
 
 static void HandleDefinition() {
-  if (ParseDefination()) {
-    fprintf(stderr, "Parsed a function definition. \n");
+  if (auto FnAST = ParseDefination()) {
+    if (auto *ir = FnAST->codegen()) {
+      fprintf(stderr, "Parsed a function definition.");
+      ir->print(errs());
+      fprintf(stderr, "\n");
+    }
   } else {
     getNextToken();
   }
 }
 
 static void HandleExtern() {
-  if (ParseExtern()) {
-    fprintf(stderr, "Parsed an extern \n");
+  if (auto ProtoAST = ParseExtern()) {
+    if (auto *ir = ProtoAST->codegen()) {
+      fprintf(stderr, "Read extern: ");
+      ir->print(errs());
+      fprintf(stderr, "\n");
+    }
   } else {
     getNextToken();
   }
 }
 
 static void HandleTopLevelExpression() {
-  if (ParseTopLevelExpr()) {
-    fprintf(stderr, "Parsed a top-level expr\n");
+  if (auto fnAST = ParseTopLevelExpr()) {
+    if (auto *ir = fnAST->codegen()) {
+      fprintf(stderr, "Parsed a top-level expr");
+      ir->print(errs());
+      fprintf(stderr, "\n");
+
+      ir->eraseFromParent();
+    }
   } else {
     getNextToken();
   }
@@ -290,7 +294,10 @@ int main() {
   Kaleidoscope::BinopPrecedence['-'] = 20;
   Kaleidoscope::BinopPrecedence['*'] = 40;
   fprintf(stderr, "ready> ");
+  InitializeModule();
   Kaleidoscope::getNextToken();
   Kaleidoscope::MainLoop();
+  // get the IR
+  TheModule->print(errs(), nullptr);
   return 0;
 }
