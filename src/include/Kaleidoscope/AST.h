@@ -31,6 +31,7 @@ using llvm::IRBuilder;
 using llvm::LLVMContext;
 using llvm::Module;
 using llvm::Type;
+using llvm::Value;
 /*
   llvm usage
 */
@@ -49,15 +50,15 @@ class ExprAST {
 
   /*
     the codegen method
-    llvm::Value represent a SSA
+    Value represent a SSA
   */
-  virtual llvm::Value *codegen() = 0;
+  virtual Value *codegen() = 0;
 };
 
 class NumberExprAST : public ExprAST {
  public:
   NumberExprAST(double Val) : Val(Val) {}
-  llvm::Value *codegen() override;
+  Value *codegen() override;
 
  private:
   double Val;
@@ -66,7 +67,7 @@ class NumberExprAST : public ExprAST {
 class VariableExprAST : public ExprAST {
  public:
   VariableExprAST(const std::string &name) : Name(name) {}
-  llvm::Value *codegen() override;
+  Value *codegen() override;
 
  private:
   std::string Name;
@@ -77,7 +78,7 @@ class BinaryExprAST : public ExprAST {
   BinaryExprAST(char Op, std::unique_ptr<ExprAST> LHS,
                 std::unique_ptr<ExprAST> RHS)
       : Op(Op), LHS(std::move(LHS)), RHS(std::move(RHS)) {}
-  llvm::Value *codegen() override;
+  Value *codegen() override;
 
  private:
   char Op;
@@ -89,7 +90,7 @@ class CallExprAST : public ExprAST {
   CallExprAST(const std::string &Callee,
               std::vector<std::unique_ptr<ExprAST>> Args)
       : Callee(Callee), Args(std::move(Args)) {}
-  llvm::Value *codegen() override;
+  Value *codegen() override;
 
  private:
   std::string Callee;
@@ -126,8 +127,8 @@ class FunctionAST {
 static std::unique_ptr<LLVMContext> TheContext;
 static std::unique_ptr<Module> TheModule;
 static std::unique_ptr<IRBuilder<>> Builder;
-static std::map<std::string, llvm::Value *> NamedValues;
+static std::map<std::string, Value *> NamedValues;
 std::unique_ptr<ExprAST> LogError(const char *Str);
 std::unique_ptr<PrototypeAST> LogErrorP(const char *Str);
-llvm::Value *LogErrorV(const char *Str);
+Value *LogErrorV(const char *Str);
 void InitializeModule();

@@ -13,27 +13,27 @@ std::unique_ptr<PrototypeAST> LogErrorP(const char *Str) {
   return nullptr;
 }
 
-llvm::Value *LogErrorV(const char *Str) {
+Value *LogErrorV(const char *Str) {
   LogError(Str);
   return nullptr;
 }
 /*
     below were some code-gen function definition, please follow it
 */
-llvm::Value *NumberExprAST::codegen() {
+Value *NumberExprAST::codegen() {
   return ConstantFP::get(*TheContext, APFloat(Val));
 }
 
-llvm::Value *VariableExprAST::codegen() {
-  llvm::Value *V = NamedValues[Name];
+Value *VariableExprAST::codegen() {
+  Value *V = NamedValues[Name];
   if (!V) {
     return LogErrorV("unknown variable name");
   }
   return V;
 }
-llvm::Value *BinaryExprAST::codegen() {
-  llvm::Value *L = LHS->codegen();
-  llvm::Value *R = RHS->codegen();
+Value *BinaryExprAST::codegen() {
+  Value *L = LHS->codegen();
+  Value *R = RHS->codegen();
 
   if (!L || !R) {
     return nullptr;
@@ -55,7 +55,7 @@ llvm::Value *BinaryExprAST::codegen() {
   }
 }
 
-llvm::Value *CallExprAST::codegen() {
+Value *CallExprAST::codegen() {
   // Module has a data structure to store all the function names;
   Function *CalleeF = TheModule->getFunction(Callee);
   if (!CalleeF) {
@@ -66,7 +66,7 @@ llvm::Value *CallExprAST::codegen() {
     return LogErrorV("Arg number does not match");
   }
 
-  std::vector<llvm::Value *> ArgsV;
+  std::vector<Value *> ArgsV;
 
   for (uint i = 0; i != Args.size(); ++i) {
     ArgsV.push_back(Args[i]->codegen());
